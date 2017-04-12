@@ -197,8 +197,8 @@ function initialize() {
     var esriNatGeo = L.esri.basemapLayer("NationalGeographic");
     layersControl.addBaseLayer(esriNatGeo, gettext("ESRI National Geographic"));
 
-    var esriUsaTopo = L.esri.basemapLayer("USATopo");
-    layersControl.addBaseLayer(esriUsaTopo, gettext("ESRI USA Topo"));
+    var esriGray = L.esri.basemapLayer("Gray");
+    layersControl.addBaseLayer(esriGray, gettext("ESRI Gray"));
 
     var esriImagery = L.esri.basemapLayer("Imagery").addTo(map);
     layersControl.addBaseLayer(esriImagery, gettext("ESRI Imagery"));
