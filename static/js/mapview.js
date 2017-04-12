@@ -188,6 +188,9 @@ function initialize() {
     var ggl = new L.Google('HYBRID');
     layersControl.addBaseLayer(ggl, gettext("Google Satellite Map"));
 
+    //var esriTopo = L.esri.basemapLayer("Topographic");
+    //layersControl.addBaseLayer(esriTopo, gettext("ESRI Topographic Map"));
+
     // Get metadata about the map from MapBox
     var tileJSONAddFn = function(mapData, addToMap) {
         var innerFn = function(tilejson) {
