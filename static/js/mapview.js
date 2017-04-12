@@ -185,67 +185,80 @@ function initialize() {
     // });
 
     // add google sat layer
-    var ggl = new L.Google('HYBRID');
-    layersControl.addBaseLayer(ggl, gettext("Google Satellite Map"));
+    //var ggl = new L.Google('HYBRID');
+    //layersControl.addBaseLayer(ggl, gettext("Google Satellite Map"));
+
+    var esriStreets = L.esri.basemapLayer("Streets");
+    layersControl.addBaseLayer(esriStreets, gettext("ESRI Streets"));
 
     var esriTopo = L.esri.basemapLayer("Topographic");
-    layersControl.addBaseLayer(esriTopo, gettext("ESRI Topographic Map"));
+    layersControl.addBaseLayer(esriTopo, gettext("ESRI Topographic"));
+
+    var esriNatGeo = L.esri.basemapLayer("NationalGeographic");
+    layersControl.addBaseLayer(esriNatGeo, gettext("ESRI National Geographic"));
+
+    var esriUsaTopo = L.esri.basemapLayer("USATopo");
+    layersControl.addBaseLayer(esriUsaTopo, gettext("ESRI USA Topo"));
+
+    var esriImagery = L.esri.basemapLayer("Imagery").addTo(map);
+    layersControl.addBaseLayer(esriImagery, gettext("ESRI Imagery"));
+    $('input[name=leaflet-base-layers]:last').attr('checked',true);
 
     // Get metadata about the map from MapBox
-    var tileJSONAddFn = function(mapData, addToMap) {
-        var innerFn = function(tilejson) {
-            var tileLayer, mapName;
-
-            tilejson.attribution = tilejson.attribution?tilejson.attribution +
-                mapBoxAdditAttribution:mapBoxAdditAttribution;
-            // check if https and change tile array appropriately
-            if(mapview.isHttps())
-            {
-                /// get map url
-                mapName = mapview.getMapboxMapname(tilejson.tiles[0]);
-                /// replace our tile url with this
-                tilejson.tiles = [sslUrlPerfix + mapName];
-            }
-            // Changed this to mapbox.tileLayer since it doesn't
-            // seem to work on Leaflet 0.6.2.
-            // tileLayer = new wax.leaf.connector(tilejson);
-            tileLayer = L.mapbox.tileLayer(mapData.url);
-
-            layersControl.addBaseLayer(tileLayer, mapData.label);
-            if(addToMap) {
-                map.addLayer(tileLayer);
-                // and radio box for this layer (last = just added)
-                $('input[name=leaflet-base-layers]:last').attr('checked',true);
-            }
-        };
-        return innerFn;
-    };
-    var defaultMap;
-    // add langauge based maps
-    _.each(languageBasedLayers, function(mapData, language){
-      mapboxMaps.push(mapData);
-      if(language_code === language)
-      {
-        defaultMap = mapData;
-      }
-    });
-    if (customMapBoxTileLayer) {
-        mapboxMaps = _.union([customMapBoxTileLayer], mapboxMaps);
-        defaultMap = customMapBoxTileLayer;
-    }
-    if(defaultMap === undefined)
-    {
-      defaultMap = mapboxMaps[0];
-    }
-    _.each(mapboxMaps, function(mapData, idx) {
-        // if https,
-        if(mapview.isHttps())
-        {
-            // change to ssl url
-            mapData.url = sslUrlPerfix + mapview.getMapboxMapname(mapData.url);
-        }
-        wax.tilejson(mapData.url, tileJSONAddFn(mapData, defaultMap == mapData)); //ie, only add the default
-    });
+    // var tileJSONAddFn = function(mapData, addToMap) {
+    //     var innerFn = function(tilejson) {
+    //         var tileLayer, mapName;
+    //
+    //         tilejson.attribution = tilejson.attribution?tilejson.attribution +
+    //             mapBoxAdditAttribution:mapBoxAdditAttribution;
+    //         // check if https and change tile array appropriately
+    //         if(mapview.isHttps())
+    //         {
+    //             /// get map url
+    //             mapName = mapview.getMapboxMapname(tilejson.tiles[0]);
+    //             /// replace our tile url with this
+    //             tilejson.tiles = [sslUrlPerfix + mapName];
+    //         }
+    //         // Changed this to mapbox.tileLayer since it doesn't
+    //         // seem to work on Leaflet 0.6.2.
+    //         // tileLayer = new wax.leaf.connector(tilejson);
+    //         tileLayer = L.mapbox.tileLayer(mapData.url);
+    //
+    //         //layersControl.addBaseLayer(tileLayer, mapData.label);
+    //         if(addToMap) {
+    //             map.addLayer(tileLayer);
+    //             // and radio box for this layer (last = just added)
+    //             $('input[name=leaflet-base-layers]:last').attr('checked',true);
+    //         }
+    //     };
+    //     return innerFn;
+    // };
+    // var defaultMap;
+    // // add langauge based maps
+    // _.each(languageBasedLayers, function(mapData, language){
+    //   mapboxMaps.push(mapData);
+    //   if(language_code === language)
+    //   {
+    //     defaultMap = mapData;
+    //   }
+    // });
+    // if (customMapBoxTileLayer) {
+    //     mapboxMaps = _.union([customMapBoxTileLayer], mapboxMaps);
+    //     defaultMap = customMapBoxTileLayer;
+    // }
+    // if(defaultMap === undefined)
+    // {
+    //   defaultMap = mapboxMaps[0];
+    // }
+    // _.each(mapboxMaps, function(mapData, idx) {
+    //     // if https,
+    //     if(mapview.isHttps())
+    //     {
+    //         // change to ssl url
+    //         mapData.url = sslUrlPerfix + mapview.getMapboxMapname(mapData.url);
+    //     }
+    //     wax.tilejson(mapData.url, tileJSONAddFn(mapData, defaultMap == mapData)); //ie, only add the default
+    // });
 
     // create legend container
     $(leafletControlSelector).append('<div class="legends-container"></div>');
