@@ -92,6 +92,10 @@ function initialize() {
     // Make a new Leaflet map in your container div
     map = new L.Map(mapId).setView(centerLatLng, defaultZoom);
 
+    map.on('baselayerchange', function(e) {
+      console.log(e);
+    });
+
     map.on('layeradd', function(layerEvent){
         if(layerEvent.layer == hexbinLayerGroup)
         {
@@ -203,6 +207,10 @@ function initialize() {
     var esriImagery = L.esri.basemapLayer("Imagery").addTo(map);
     layersControl.addBaseLayer(esriImagery, gettext("ESRI Imagery"));
     $('input[name=leaflet-base-layers]:last').attr('checked',true);
+
+    var esriImageryLabels = L.esri.basemapLayer("ImageryLabels").addTo(map);
+    layersControl.addOverlay(esriImageryLabels, gettext("ESRI Imagery Labels"));
+
 
     // Get metadata about the map from MapBox
     // var tileJSONAddFn = function(mapData, addToMap) {
