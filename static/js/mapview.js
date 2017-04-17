@@ -197,14 +197,45 @@ function initialize() {
     var esriNatGeo = L.esri.basemapLayer("NationalGeographic");
     layersControl.addBaseLayer(esriNatGeo, gettext("ESRI National Geographic"));
 
+    var esriOceans = L.esri.basemapLayer("Oceans");
+    layersControl.addBaseLayer(esriOceans, gettext("ESRI Oceans"));
+
     var esriGray = L.esri.basemapLayer("Gray");
     layersControl.addBaseLayer(esriGray, gettext("ESRI Gray"));
 
+    var esriDarkGray = L.esri.basemapLayer("DarkGray");
+    layersControl.addBaseLayer(esriDarkGray, gettext("ESRI Dark Gray"));
+
     var esriImagery = L.esri.basemapLayer("Imagery").addTo(map);
     layersControl.addBaseLayer(esriImagery, gettext("ESRI Imagery"));
+    
+    var esriShaded = L.esri.basemapLayer("Shaded Relief");
+    layersControl.addBaseLayer(esriShaded, gettext("ESRI Shaded Relief"));
+
+    var esriTerrain = L.esri.basemapLayer("Terrain");
+    layersControl.addBaseLayer(esriTerrain, gettext("ESRI Terrain"));
 
     var esriImageryLabels = L.esri.basemapLayer("ImageryLabels").addTo(map);
     layersControl.addOverlay(esriImageryLabels, gettext("ESRI Imagery Labels"));
+    
+    var esriGrayLabels = L.esri.basemapLayer("GrayLabels").addTo(map);
+    layersControl.addOverlay(esriGrayLabels, gettext("ESRI Gray Labels"));
+
+    var esriDarkGrayLabels = L.esri.basemapLayer("DarkGrayLabels").addTo(map);
+    layersControl.addOverlay(esriDarkGrayLabels, gettext("ESRI Dark Gray Labels"));
+
+    var esriOceansLabels = L.esri.basemapLayer("OceansLabels").addTo(map);
+    layersControl.addOverlay(esriOceansLabels, gettext("ESRI Oceans Labels"));
+
+    var esriImageryTransLabels = L.esri.basemapLayer("ImageryTransportationLabels").addTo(map);
+    layersControl.addOverlay(esriImageryTransLabels, gettext("ESRI Imagery Transportation Labels"));
+
+    var esriShadedLabels = L.esri.basemapLayer("ShadedReliefLabels").addTo(map);
+    layersControl.addOverlay(esriShadedLabels, gettext("ESRI Shaded Relief Labels"));
+
+    var esriTerrainLabels = L.esri.basemapLayer("TerrainLabels").addTo(map);
+    layersControl.addOverlay(esriTerrainLabels, gettext("ESRI Terrain Labels"));
+
 
 
     // Get metadata about the map from MapBox
