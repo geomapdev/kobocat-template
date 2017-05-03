@@ -227,8 +227,8 @@ function initialize() {
     var esriOceansLabels = L.esri.basemapLayer("OceansLabels").addTo(map);
     layersControl.addOverlay(esriOceansLabels, gettext("ESRI Oceans Labels"));
 
-    var esriImageryTransLabels = L.esri.basemapLayer("ImageryTransportationLabels").addTo(map);
-    layersControl.addOverlay(esriImageryTransLabels, gettext("ESRI Imagery Transportation Labels"));
+    //var esriImageryTransLabels = L.esri.basemapLayer("ImageryTransportationLabels").addTo(map);
+    //layersControl.addOverlay(esriImageryTransLabels, gettext("ESRI Imagery Transportation Labels"));
 
     var esriShadedLabels = L.esri.basemapLayer("ShadedReliefLabels").addTo(map);
     layersControl.addOverlay(esriShadedLabels, gettext("ESRI Shaded Relief Labels"));
