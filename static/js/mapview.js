@@ -218,22 +218,22 @@ function initialize() {
     var esriImageryLabels = L.esri.basemapLayer("ImageryLabels").addTo(map);
     layersControl.addOverlay(esriImageryLabels, gettext("ESRI Imagery Labels"));
     
-    var esriGrayLabels = L.esri.basemapLayer("GrayLabels").addTo(map);
+    var esriGrayLabels = L.esri.basemapLayer("GrayLabels");
     layersControl.addOverlay(esriGrayLabels, gettext("ESRI Gray Labels"));
 
-    var esriDarkGrayLabels = L.esri.basemapLayer("DarkGrayLabels").addTo(map);
+    var esriDarkGrayLabels = L.esri.basemapLayer("DarkGrayLabels");
     layersControl.addOverlay(esriDarkGrayLabels, gettext("ESRI Dark Gray Labels"));
 
-    var esriOceansLabels = L.esri.basemapLayer("OceansLabels").addTo(map);
+    var esriOceansLabels = L.esri.basemapLayer("OceansLabels");
     layersControl.addOverlay(esriOceansLabels, gettext("ESRI Oceans Labels"));
 
     //var esriImageryTransLabels = L.esri.basemapLayer("ImageryTransportationLabels").addTo(map);
     //layersControl.addOverlay(esriImageryTransLabels, gettext("ESRI Imagery Transportation Labels"));
 
-    var esriShadedLabels = L.esri.basemapLayer("ShadedReliefLabels").addTo(map);
+    var esriShadedLabels = L.esri.basemapLayer("ShadedReliefLabels");
     layersControl.addOverlay(esriShadedLabels, gettext("ESRI Shaded Relief Labels"));
 
-    var esriTerrainLabels = L.esri.basemapLayer("TerrainLabels").addTo(map);
+    var esriTerrainLabels = L.esri.basemapLayer("TerrainLabels");
     layersControl.addOverlay(esriTerrainLabels, gettext("ESRI Terrain Labels"));
 
 
