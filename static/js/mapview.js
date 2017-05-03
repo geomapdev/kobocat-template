@@ -209,7 +209,7 @@ function initialize() {
     var esriImagery = L.esri.basemapLayer("Imagery").addTo(map);
     layersControl.addBaseLayer(esriImagery, gettext("ESRI Imagery"));
     
-    var esriShaded = L.esri.basemapLayer("Shaded Relief");
+    var esriShaded = L.esri.basemapLayer("ShadedRelief");
     layersControl.addBaseLayer(esriShaded, gettext("ESRI Shaded Relief"));
 
     var esriTerrain = L.esri.basemapLayer("Terrain");
