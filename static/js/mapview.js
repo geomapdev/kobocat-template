@@ -208,7 +208,7 @@ function initialize() {
 
     var esriImagery = L.esri.basemapLayer("Imagery").addTo(map);
     layersControl.addBaseLayer(esriImagery, gettext("ESRI Imagery"));
-    
+
     var esriShaded = L.esri.basemapLayer("ShadedRelief");
     layersControl.addBaseLayer(esriShaded, gettext("ESRI Shaded Relief"));
 
@@ -217,7 +217,7 @@ function initialize() {
 
     var esriImageryLabels = L.esri.basemapLayer("ImageryLabels").addTo(map);
     layersControl.addOverlay(esriImageryLabels, gettext("ESRI Imagery Labels"));
-    
+
     var esriGrayLabels = L.esri.basemapLayer("GrayLabels");
     layersControl.addOverlay(esriGrayLabels, gettext("ESRI Gray Labels"));
 
@@ -485,25 +485,42 @@ function setLanguage(idx)
 function _buildMarkerLayer(geoJSON)
 {
     var latLngArray = [];
+    var geometryBounds = null;
 
     L.geoJson(geoJSON, {
-        pointToLayer: function(feature, latlng) {
-            var marker = L.circleMarker(latlng, circleStyle);
-            latLngArray.push(latlng);
-            marker.on('click', function(e) {
-                activeMarker = marker;
-                displayDataModal(feature.id);
-            });
-            return marker;
+      pointToLayer: function(feature, latlng) {
+          var marker = L.circleMarker(latlng, circleStyle);
+          latLngArray.push(latlng);
+          if (geometryBounds !== null){
+            geometryBounds.extend(latLng);
+          } else {
+            geometryBounds = new L.LatLngBounds(latLngArray);
+          }
+          marker.on('click', function(e) {
+              displayDataModal(feature.id);
+          });
+          return marker;
+      },
+        onEachFeature: function(feature, layer) {
+          if (geometryBounds !== null){
+              geometryBounds.extend(layer.getBounds());
+          } else {
+              geometryBounds = new L.LatLngBounds(layer.getBounds());
+          }
+          layer.on('click', function(e) {
+              displayDataModal(feature.id);
+          });
         }
-    }).addTo(markerLayerGroup);
+  }).addTo(markerLayerGroup);
 
     _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 
     // fitting to bounds with one point will zoom too far
     // don't zoom when we "view by response"
-    var latlngbounds = new L.LatLngBounds(latLngArray);
-    map.fitBounds(latlngbounds);
+    if (geometryBounds==null){
+        geometryBounds = new L.LatLngBounds([[85, -180],[-85, 180]]);
+    }
+    map.fitBounds(geometryBounds);
 }
 
 function _recolorMarkerLayer(questionName, responseFilterList)
