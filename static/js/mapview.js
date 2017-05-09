@@ -492,7 +492,7 @@ function _buildMarkerLayer(geoJSON)
           var marker = L.circleMarker(latlng, circleStyle);
           latLngArray.push(latlng);
           if (geometryBounds !== null){
-            geometryBounds.extend(latLng);
+            geometryBounds.extend(latlng);
           } else {
             geometryBounds = new L.LatLngBounds(latLngArray);
           }
