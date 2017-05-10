@@ -510,7 +510,6 @@ function _buildMarkerLayer(geoJSON)
           } else {
               geometryBounds = new L.LatLngBounds(layer.getBounds());
           }
-          layer.setStyle({fill:false});
           layer.on('click', function(e) {
               displayDataModal(feature.id);
           });
