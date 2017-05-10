@@ -928,7 +928,7 @@ function rebuildLegend(questionName, questionColorMap)
 function getBootstrapFields()
 {
     // we only want to load gps and select one data to begin with
-    var fields = ['_id', constants.GEOLOCATION];
+    var fields = ['_id', constants.GEOLOCATION, constants.GEOMETRY];
     var idx, question;
     if(!constants) throw getBootstrapFields__str;
     for(idx in formJSONMngr.selectOneQuestions)
