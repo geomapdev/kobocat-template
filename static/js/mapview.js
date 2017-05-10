@@ -491,19 +491,19 @@ function _buildMarkerLayer(geoJSON)
     var geometryBounds = null;
 
     L.geoJson(geoJSON, {
-      // pointToLayer: function(feature, latlng) {
-      //     var marker = L.circleMarker(latlng, circleStyle);
-      //     latLngArray.push(latlng);
-      //     if (geometryBounds !== null){
-      //       geometryBounds.extend(latlng);
-      //     } else {
-      //       geometryBounds = new L.LatLngBounds(latLngArray);
-      //     }
-      //     marker.on('click', function(e) {
-      //         displayDataModal(feature.id);
-      //     });
-      //     return marker;
-      // },
+      pointToLayer: function(feature, latlng) {
+          var marker = L.circleMarker(latlng, circleStyle);
+          latLngArray.push(latlng);
+          if (geometryBounds !== null){
+            geometryBounds.extend(latlng);
+          } else {
+            geometryBounds = new L.LatLngBounds(latLngArray);
+          }
+          // marker.on('click', function(e) {
+          //     displayDataModal(feature.id);
+          // });
+          return marker;
+      },
         onEachFeature: function(feature, layer) {
           if (geometryBounds !== null){
               geometryBounds.extend(layer.getBounds());
