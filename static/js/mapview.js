@@ -340,7 +340,10 @@ function loadFormJSONCallback()
 {
     // we only want to load gps and select one data to begin with
     var fields = getBootstrapFields();
-    var geoField = formJSONMngr.getGeoPointQuestion()[constants.NAME];
+    var gpq = formJSONMngr.getGeoPointQuestion();
+    var geoField = null;
+    if (gpq!==null)
+      geoField = gpq[constants.NAME];
 
     // load responses
     formResponseMngr.loadResponseData({}, 0, null, geoField, fields);
