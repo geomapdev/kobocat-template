@@ -513,6 +513,9 @@ function _buildMarkerLayer(geoJSON)
           layer.on('click', function(e) {
               displayDataModal(feature.id);
           });
+        },
+        style: function(feature) {
+                return {fill: false};
         }
   }).addTo(markerLayerGroup);
 
