@@ -594,48 +594,24 @@ function _buildMarkerLayer(geoJSON)
       }
   }).addTo(markerLayerGroup);
 
-  _.defer(_buildLineLayer(geoJSON)); // TODO: add a toggle to do this only if hexOn = true;
-
-  // fitting to bounds with one point will zoom too far
-  // don't zoom when we "view by response"
-  if (map && geometryBounds){
-      map.fitBounds(geometryBounds);
-  }
-
-}
-
-function _buildLineLayer(geoJSON)
-{
-    var geometryBounds = null;
-
-    L.geoJson(geoJSON, {
-      onEachFeature: function(feature, layer) {
-        if (geometryBounds){
-            geometryBounds.extend(layer.getBounds());
-        } else {
-            geometryBounds = new L.LatLngBounds(layer.getBounds());
-        }
-        layer.on('click', function(e) {
-            displayDataModal(feature.id);
-        });
-      },
-      filter: function(feature,layer){
-         if (feature.geometry.type=='LineString') return true;
-      },
-      style:lineStyle
+  L.geoJson(geoJSON, {
+    onEachFeature: function(feature, layer) {
+      if (geometryBounds){
+          geometryBounds.extend(layer.getBounds());
+      } else {
+          geometryBounds = new L.LatLngBounds(layer.getBounds());
+      }
+      layer.on('click', function(e) {
+          displayDataModal(feature.id);
+      });
+    },
+    filter: function(feature,layer){
+       if (feature.geometry.type=='LineString') return true;
+    },
+    style:lineStyle
   }).addTo(lineLayerGroup);
 
-  _.defer(_buildPolygonLayer(geoJSON)); // TODO: add a toggle to do this only if hexOn = true;
-
-  if (map && geometryBounds){
-      map.fitBounds(geometryBounds);
-  }
-}
-function _buildPolygonLayer(geoJSON)
-{
-    var geometryBounds = null;
-
-    L.geoJson(geoJSON, {
+  L.geoJson(geoJSON, {
       onEachFeature: function(feature, layer) {
         if (geometryBounds){
             geometryBounds.extend(layer.getBounds());
@@ -654,9 +630,12 @@ function _buildPolygonLayer(geoJSON)
 
   _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 
+  // fitting to bounds with one point will zoom too far
+  // don't zoom when we "view by response"
   if (map && geometryBounds){
       map.fitBounds(geometryBounds);
   }
+
 }
 
 
@@ -709,55 +688,6 @@ function _recolorMarkerLayer(questionName, responseFilterList)
                 }
             });
         });
-        // build the legend
-        rebuildLegend(questionName, questionColorMap);
-    } else {
-        markerLayerGroup.eachLayer(function(geoJSONLayer) {
-            geoJSONLayer.setStyle(circleStyle);
-        });
-        clearLegend();
-    }
-    _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
-}
-
-function _recolorLineLayer(questionName, responseFilterList)
-{
-    var questionColorMap = {};
-    var randomColorStep = 0;
-    var paletteCounter = 0;
-    var responseCountValid = false;
-
-    if(questionName)
-    {
-        var question = formJSONMngr.getQuestionByName(questionName);
-
-        // figure out the response counts
-        var dvCounts = formResponseMngr.dvQuery({dims:[questionName], vals:[dv.count()]});
-        var responseCounts = _.object(dvCounts[0], dvCounts[1]);
-        responseCounts[notSpecifiedCaption] = responseCounts[undefined]; //undefined = special case
-        // and make sure every response has a count
-        var choiceNames = _.union(_.pluck(question.children, 'name'), [notSpecifiedCaption]);
-        var zeroCounts = _.object(_.map(choiceNames, function(choice) { return [choice, 0]; }));
-        question.responseCounts = _.defaults(responseCounts, zeroCounts);
-
-        // TODO: put the following for loop in the colors module
-        for(i=0;i < choiceNames.length;i++)
-        {
-            var choiceName = choiceNames[i];
-            var choiceColor = null;
-            // check if color palette has colors we haven't used
-            if(paletteCounter < colorPalette.length)
-                choiceColor = colorPalette[paletteCounter++];
-            else
-            {
-                // number of steps is reduced by the number of colors in our palette
-                choiceColor = get_random_color(randomColorStep++, (choiceNames.length - colorPalette.length));
-            }
-            /// save color for this choice
-            questionColorMap[choiceName] = choiceColor;
-        }
-
-        // re-color the icons
         lineLayerGroup.eachLayer(function(geoJSONLayer) {
             geoJSONLayer.setStyle(function(feature) {
                 var response = feature.properties[questionName] || notSpecifiedCaption;
@@ -769,55 +699,6 @@ function _recolorLineLayer(questionName, responseFilterList)
                 }
             });
         });
-
-        // build the legend
-        rebuildLegend(questionName, questionColorMap);
-    } else {
-        lineLayerGroup.eachLayer(function(geoJSONLayer) {
-            geoJSONLayer.setStyle(lineStyle);
-        });
-        clearLegend();
-    }
-}
-
-function _recolorPolygonLayer(questionName, responseFilterList)
-{
-    var questionColorMap = {};
-    var randomColorStep = 0;
-    var paletteCounter = 0;
-    var responseCountValid = false;
-
-    if(questionName)
-    {
-        var question = formJSONMngr.getQuestionByName(questionName);
-
-        // figure out the response counts
-        var dvCounts = formResponseMngr.dvQuery({dims:[questionName], vals:[dv.count()]});
-        var responseCounts = _.object(dvCounts[0], dvCounts[1]);
-        responseCounts[notSpecifiedCaption] = responseCounts[undefined]; //undefined = special case
-        // and make sure every response has a count
-        var choiceNames = _.union(_.pluck(question.children, 'name'), [notSpecifiedCaption]);
-        var zeroCounts = _.object(_.map(choiceNames, function(choice) { return [choice, 0]; }));
-        question.responseCounts = _.defaults(responseCounts, zeroCounts);
-
-        // TODO: put the following for loop in the colors module
-        for(i=0;i < choiceNames.length;i++)
-        {
-            var choiceName = choiceNames[i];
-            var choiceColor = null;
-            // check if color palette has colors we haven't used
-            if(paletteCounter < colorPalette.length)
-                choiceColor = colorPalette[paletteCounter++];
-            else
-            {
-                // number of steps is reduced by the number of colors in our palette
-                choiceColor = get_random_color(randomColorStep++, (choiceNames.length - colorPalette.length));
-            }
-            /// save color for this choice
-            questionColorMap[choiceName] = choiceColor;
-        }
-
-        // re-color the icons
         polygonLayerGroup.eachLayer(function(geoJSONLayer) {
             geoJSONLayer.setStyle(function(feature) {
                 var response = feature.properties[questionName] || notSpecifiedCaption;
@@ -829,15 +710,21 @@ function _recolorPolygonLayer(questionName, responseFilterList)
                 }
             });
         });
-
         // build the legend
         rebuildLegend(questionName, questionColorMap);
     } else {
+        markerLayerGroup.eachLayer(function(geoJSONLayer) {
+            geoJSONLayer.setStyle(circleStyle);
+        });
+        lineLayerGroup.eachLayer(function(geoJSONLayer) {
+            geoJSONLayer.setStyle(lineStyle);
+        });
         polygonLayerGroup.eachLayer(function(geoJSONLayer) {
             geoJSONLayer.setStyle(polygonStyle);
         });
         clearLegend();
     }
+    _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 }
 
 function _reStyleAndBindPopupsToHexOverLay(newHexStylesByID, newHexPopupsByID) {
