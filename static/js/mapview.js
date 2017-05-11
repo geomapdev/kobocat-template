@@ -190,7 +190,7 @@ function initialize() {
         }
     };
 
-    map.addControl(layerButtonControl(markerButton, hexButton));
+    map.addControl(layerButtonControl(markerButton, lineButton, polygonButton, hexButton));
     layersControl = new L.Control.Layers();
     map.addControl(layersControl);
 
