@@ -604,29 +604,25 @@ function _buildMarkerLayer(geoJSON)
       layer.on('click', function(e) {
           displayDataModal(feature.id);
       });
-    },
-    filter: function(feature,layer){
-       if (feature.geometry.type=='LineString') return true;
-    },
-    style:lineStyle
+    }
   }).addTo(lineLayerGroup);
 
-  L.geoJson(geoJSON, {
-      onEachFeature: function(feature, layer) {
-        if (geometryBounds){
-            geometryBounds.extend(layer.getBounds());
-        } else {
-            geometryBounds = new L.LatLngBounds(layer.getBounds());
-        }
-        layer.on('click', function(e) {
-            displayDataModal(feature.id);
-        });
-      },
-      filter: function(feature,layer){
-         if (feature.geometry.type=='Polygon') return true;
-      },
-      style:polygonStyle
-  }).addTo(polygonLayerGroup);
+  // L.geoJson(geoJSON, {
+  //     onEachFeature: function(feature, layer) {
+  //       if (geometryBounds){
+  //           geometryBounds.extend(layer.getBounds());
+  //       } else {
+  //           geometryBounds = new L.LatLngBounds(layer.getBounds());
+  //       }
+  //       layer.on('click', function(e) {
+  //           displayDataModal(feature.id);
+  //       });
+  //     },
+  //     filter: function(feature,layer){
+  //        if (feature.geometry.type=='Polygon') return true;
+  //     },
+  //     style:polygonStyle
+  // }).addTo(polygonLayerGroup);
 
   _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 
