@@ -572,18 +572,18 @@ function setLanguage(idx)
 
 function _buildMarkerLayer(geoJSON)
 {
-    var latLngArray = [];
-    var geometryBounds = null;
+    //var latLngArray = [];
+    //var geometryBounds = null;
 
     L.geoJson(geoJSON, {
       pointToLayer: function(feature, latlng) {
           var marker = L.circleMarker(latlng, circleStyle);
-          latLngArray.push(latlng);
-          if (geometryBounds){
-            geometryBounds.extend(latlng);
-          } else {
-            geometryBounds = new L.LatLngBounds(latLngArray);
-          }
+          // latLngArray.push(latlng);
+          // if (geometryBounds){
+          //   geometryBounds.extend(latlng);
+          // } else {
+          //   geometryBounds = new L.LatLngBounds(latLngArray);
+          // }
           marker.on('click', function(e) {
               displayDataModal(feature.id);
           });
@@ -596,11 +596,11 @@ function _buildMarkerLayer(geoJSON)
 
   L.geoJson(geoJSON, {
     onEachFeature: function(feature, layer) {
-      if (geometryBounds){
-          geometryBounds.extend(layer.getBounds());
-      } else {
-          geometryBounds = new L.LatLngBounds(layer.getBounds());
-      }
+      // if (geometryBounds){
+      //     geometryBounds.extend(layer.getBounds());
+      // } else {
+      //     geometryBounds = new L.LatLngBounds(layer.getBounds());
+      // }
       layer.on('click', function(e) {
           displayDataModal(feature.id);
       });
@@ -628,8 +628,8 @@ function _buildMarkerLayer(geoJSON)
 
   // fitting to bounds with one point will zoom too far
   // don't zoom when we "view by response"
-  if (map && geometryBounds){
-      map.fitBounds(geometryBounds);
+  if (map && geoJSON){
+      map.fitBounds(geoJSON.getBounds());
   }
 
 }
