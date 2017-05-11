@@ -197,6 +197,10 @@ function initialize() {
     //show marker layer by default
     map.addLayer(markerLayerGroup);
     $('div.layer-markerButton').addClass('layer-markerButton-active');
+    map.addLayer(lineLayerGroup);
+    $('div.layer-markerButton').addClass('layer-markerButton-active');
+    map.addLayer(polygonLayerGroup);
+    $('div.layer-markerButton').addClass('layer-markerButton-active');
 
     var drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
@@ -451,8 +455,6 @@ function loadResponseDataCallback()
     var geoJSON = formResponseMngr.getAsGeoJSON();
 
     _buildMarkerLayer(geoJSON);
-    _buildLineLayer(geoJSON);
-    _buildPolygonLayer(geoJSON);
     _updateGeoCodedCount(geoJSON);
 
     // just to make sure the nav container exists
@@ -577,21 +579,22 @@ function _buildMarkerLayer(geoJSON)
       pointToLayer: function(feature, latlng) {
           var marker = L.circleMarker(latlng, circleStyle);
           latLngArray.push(latlng);
-          if (geometryBounds !== null){
+          if (geometryBounds){
             geometryBounds.extend(latlng);
           } else {
             geometryBounds = new L.LatLngBounds(latLngArray);
           }
-          // marker.on('click', function(e) {
-          //     displayDataModal(feature.id);
-          // });
+          marker.on('click', function(e) {
+              displayDataModal(feature.id);
+          });
           return marker;
       },
       filter: function(feature,layer){
         if (feature.geometry.type=='Point') return true;
       }
   }).addTo(markerLayerGroup);
-  _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
+
+  _.defer(_buildLineLayer(geoJSON)); // TODO: add a toggle to do this only if hexOn = true;
 
   // fitting to bounds with one point will zoom too far
   // don't zoom when we "view by response"
@@ -607,7 +610,7 @@ function _buildLineLayer(geoJSON)
 
     L.geoJson(geoJSON, {
       onEachFeature: function(feature, layer) {
-        if (geometryBounds !== null){
+        if (geometryBounds){
             geometryBounds.extend(layer.getBounds());
         } else {
             geometryBounds = new L.LatLngBounds(layer.getBounds());
@@ -622,7 +625,7 @@ function _buildLineLayer(geoJSON)
       style:lineStyle
   }).addTo(lineLayerGroup);
 
-  _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
+  _.defer(_buildPolygonLayer(geoJSON)); // TODO: add a toggle to do this only if hexOn = true;
 
   if (map && geometryBounds){
       map.fitBounds(geometryBounds);
@@ -634,7 +637,7 @@ function _buildPolygonLayer(geoJSON)
 
     L.geoJson(geoJSON, {
       onEachFeature: function(feature, layer) {
-        if (geometryBounds !== null){
+        if (geometryBounds){
             geometryBounds.extend(layer.getBounds());
         } else {
             geometryBounds = new L.LatLngBounds(layer.getBounds());
@@ -649,6 +652,8 @@ function _buildPolygonLayer(geoJSON)
       style:polygonStyle
   }).addTo(polygonLayerGroup);
 
+  _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
+
   if (map && geometryBounds){
       map.fitBounds(geometryBounds);
   }
@@ -657,7 +662,6 @@ function _buildPolygonLayer(geoJSON)
 
 function _recolorMarkerLayer(questionName, responseFilterList)
 {
-    var latLngArray = [];
     var questionColorMap = {};
     var randomColorStep = 0;
     var paletteCounter = 0;
@@ -705,6 +709,55 @@ function _recolorMarkerLayer(questionName, responseFilterList)
                 }
             });
         });
+        // build the legend
+        rebuildLegend(questionName, questionColorMap);
+    } else {
+        markerLayerGroup.eachLayer(function(geoJSONLayer) {
+            geoJSONLayer.setStyle(circleStyle);
+        });
+        clearLegend();
+    }
+    _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
+}
+
+function _recolorLineLayer(questionName, responseFilterList)
+{
+    var questionColorMap = {};
+    var randomColorStep = 0;
+    var paletteCounter = 0;
+    var responseCountValid = false;
+
+    if(questionName)
+    {
+        var question = formJSONMngr.getQuestionByName(questionName);
+
+        // figure out the response counts
+        var dvCounts = formResponseMngr.dvQuery({dims:[questionName], vals:[dv.count()]});
+        var responseCounts = _.object(dvCounts[0], dvCounts[1]);
+        responseCounts[notSpecifiedCaption] = responseCounts[undefined]; //undefined = special case
+        // and make sure every response has a count
+        var choiceNames = _.union(_.pluck(question.children, 'name'), [notSpecifiedCaption]);
+        var zeroCounts = _.object(_.map(choiceNames, function(choice) { return [choice, 0]; }));
+        question.responseCounts = _.defaults(responseCounts, zeroCounts);
+
+        // TODO: put the following for loop in the colors module
+        for(i=0;i < choiceNames.length;i++)
+        {
+            var choiceName = choiceNames[i];
+            var choiceColor = null;
+            // check if color palette has colors we haven't used
+            if(paletteCounter < colorPalette.length)
+                choiceColor = colorPalette[paletteCounter++];
+            else
+            {
+                // number of steps is reduced by the number of colors in our palette
+                choiceColor = get_random_color(randomColorStep++, (choiceNames.length - colorPalette.length));
+            }
+            /// save color for this choice
+            questionColorMap[choiceName] = choiceColor;
+        }
+
+        // re-color the icons
         lineLayerGroup.eachLayer(function(geoJSONLayer) {
             geoJSONLayer.setStyle(function(feature) {
                 var response = feature.properties[questionName] || notSpecifiedCaption;
@@ -716,6 +769,55 @@ function _recolorMarkerLayer(questionName, responseFilterList)
                 }
             });
         });
+
+        // build the legend
+        rebuildLegend(questionName, questionColorMap);
+    } else {
+        lineLayerGroup.eachLayer(function(geoJSONLayer) {
+            geoJSONLayer.setStyle(lineStyle);
+        });
+        clearLegend();
+    }
+}
+
+function _recolorPolygonLayer(questionName, responseFilterList)
+{
+    var questionColorMap = {};
+    var randomColorStep = 0;
+    var paletteCounter = 0;
+    var responseCountValid = false;
+
+    if(questionName)
+    {
+        var question = formJSONMngr.getQuestionByName(questionName);
+
+        // figure out the response counts
+        var dvCounts = formResponseMngr.dvQuery({dims:[questionName], vals:[dv.count()]});
+        var responseCounts = _.object(dvCounts[0], dvCounts[1]);
+        responseCounts[notSpecifiedCaption] = responseCounts[undefined]; //undefined = special case
+        // and make sure every response has a count
+        var choiceNames = _.union(_.pluck(question.children, 'name'), [notSpecifiedCaption]);
+        var zeroCounts = _.object(_.map(choiceNames, function(choice) { return [choice, 0]; }));
+        question.responseCounts = _.defaults(responseCounts, zeroCounts);
+
+        // TODO: put the following for loop in the colors module
+        for(i=0;i < choiceNames.length;i++)
+        {
+            var choiceName = choiceNames[i];
+            var choiceColor = null;
+            // check if color palette has colors we haven't used
+            if(paletteCounter < colorPalette.length)
+                choiceColor = colorPalette[paletteCounter++];
+            else
+            {
+                // number of steps is reduced by the number of colors in our palette
+                choiceColor = get_random_color(randomColorStep++, (choiceNames.length - colorPalette.length));
+            }
+            /// save color for this choice
+            questionColorMap[choiceName] = choiceColor;
+        }
+
+        // re-color the icons
         polygonLayerGroup.eachLayer(function(geoJSONLayer) {
             geoJSONLayer.setStyle(function(feature) {
                 var response = feature.properties[questionName] || notSpecifiedCaption;
@@ -731,18 +833,11 @@ function _recolorMarkerLayer(questionName, responseFilterList)
         // build the legend
         rebuildLegend(questionName, questionColorMap);
     } else {
-        markerLayerGroup.eachLayer(function(geoJSONLayer) {
-            geoJSONLayer.setStyle(circleStyle);
-        });
-        lineLayerGroup.eachLayer(function(geoJSONLayer) {
-            geoJSONLayer.setStyle(lineStyle);
-        });
         polygonLayerGroup.eachLayer(function(geoJSONLayer) {
             geoJSONLayer.setStyle(polygonStyle);
         });
         clearLegend();
     }
-    _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 }
 
 function _reStyleAndBindPopupsToHexOverLay(newHexStylesByID, newHexPopupsByID) {
