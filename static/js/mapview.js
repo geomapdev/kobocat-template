@@ -572,6 +572,7 @@ function setLanguage(idx)
 
 function _buildMarkerLayer(geoJSON)
 {
+    console.log(geoJSON);
     //var latLngArray = [];
     //var geometryBounds = null;
 
