@@ -104,7 +104,48 @@ body { height: 100%; margin: 0; padding: 0 }
     height: 34px;
     border-bottom: 1px solid #aaa;
 }
-
+.layer-button-container .layer-lineButton{
+    background-image: url(images/line_overlay.png);
+    background-repeat:no-repeat;
+    background-position: center;
+    width: 34px;
+    height: 34px;
+    border-bottom: 1px solid #aaa;
+}
+.layer-button-container  .layer-lineButton.layer-lineButton-active{
+    background-color: rgba(153, 153, 153, 0.2);
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-image: url(images/line_overlay_active.png);
+    background-repeat:no-repeat;
+    background-position: center;
+    width: 34px;
+    height: 34px;
+    border-bottom: 1px solid #aaa;
+}
+.layer-button-container .layer-polygonButton{
+    background-image: url(images/polygon_overlay.png);
+    background-repeat:no-repeat;
+    background-position: center;
+    width: 34px;
+    height: 34px;
+    border-bottom: 1px solid #aaa;
+}
+.layer-button-container  .layer-polygonButton.layer-polygonButton-active{
+    background-color: rgba(153, 153, 153, 0.2);
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-image: url(images/polygon_overlay_active.png);
+    background-repeat:no-repeat;
+    background-position: center;
+    width: 34px;
+    height: 34px;
+    border-bottom: 1px solid #aaa;
+}
 .layer-button-container .layer-hexbinButton{
     background-image: url(images/hexbin_overlay.png);
     background-repeat:no-repeat;

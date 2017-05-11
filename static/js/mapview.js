@@ -32,21 +32,39 @@ var notSpecifiedCaption = gettext("Not Specified");
 var colorPalette = ['#8DD3C7', '#FB8072', '#FFFFB3', '#BEBADA', '#80B1D3', '#FDB462', '#B3DE69', '#FCCDE5', '#D9D9D9',
     '#BC80BD', '#CCEBC5', '#FFED6F'];
 var circleStyle = {
+    color: '#fff',
+    border: 8,
+    fillColor: '#ff3300',
+    fillOpacity: 0.9,
+    radius: 8,
+    opacity: 0.5
+};
+var lineStyle = {
+    color: '#ff3300',
+    border: 8,
+    opacity: 0.5
+};
+var polygonStyle = {
     color: '#ff3300',
     border: 8,
     fillColor: '#ff3300',
     fillOpacity: 0.5,
-    radius: 8,
     opacity: 0.5
 };
 // TODO: can we get the entire URL from mongo API
 var amazonUrlPrefix = "https://formhub.s3.amazonaws.com/";
 var markerLayerGroup = new L.LayerGroup();
+var lineLayerGroup = new L.LayerGroup();
+var polygonLayerGroup = new L.LayerGroup();
 var markerLayerGroupActive = false;
+var lineLayerGroupActive = false;
+var polygonLayerGroupActive = false;
 var hexbinLayerGroupActive = false;
 var hexbinLayerGroup = new L.LayerGroup();
 var hexbinData = null;
 var markerLayerLabel = gettext("Marker Layer");
+var lineLayerLabel = gettext("Line Layer");
+var polygonLayerLabel = gettext("Polygon Layer");
 var hexbinLayerLabel = "Hexbin Layer";
 // TODO: generate new api key for formhub at https://www.bingmapsportal.com/application/index/1121012?status=NoStatus
 var bingAPIKey = 'AtyTytHaexsLBZRFM6xu9DGevbYyVPykavcwVWG6wk24jYiEO9JJSmZmLuekkywR';
@@ -101,6 +119,14 @@ function initialize() {
         {
             markerLayerAdded(layerEvent.layer);
         }
+        else if(layerEvent.layer == lineLayerGroup)
+        {
+            lineLayerAdded(layerEvent.layer);
+        }
+        else if(layerEvent.layer == polygonLayerGroup)
+        {
+            polygonLayerAdded(layerEvent.layer);
+        }
     });
 
     map.on('layerremove', function(layerEvent){
@@ -111,6 +137,14 @@ function initialize() {
         else if(layerEvent.layer == markerLayerGroup)
         {
             markerLayerRemoved(layerEvent.layer);
+        }
+        else if(layerEvent.layer == lineLayerGroup)
+        {
+            lineLayerRemoved(layerEvent.layer);
+        }
+        else if(layerEvent.layer == polygonLayerGroup)
+        {
+            polygonLayerRemoved(layerEvent.layer);
         }
     });
 
@@ -133,6 +167,26 @@ function initialize() {
         else{
             $('div.layer-markerButton').toggleClass('layer-markerButton-active');
             return map.removeLayer(markerLayerGroup);
+        }
+    };
+    var lineButton = function () {
+        if(!map.hasLayer(lineLayerGroup)) {
+            $('div.layer-lineButton').toggleClass('layer-lineButton-active');
+            return map.addLayer(lineLayerGroup);
+        }
+        else{
+            $('div.layer-lineButton').toggleClass('layer-lineButton-active');
+            return map.removeLayer(lineLayerGroup);
+        }
+    };
+    var polygonButton = function () {
+        if(!map.hasLayer(polygonLayerGroup)) {
+            $('div.layer-polygonButton').toggleClass('layer-polygonButton-active');
+            return map.addLayer(polygonLayerGroup);
+        }
+        else{
+            $('div.layer-polygonButton').toggleClass('layer-polygonButton-active');
+            return map.removeLayer(polygonLayerGroup);
         }
     };
 
@@ -326,11 +380,38 @@ function markerLayerAdded(layer)
     if(elm.length > 0)
         elm.show();
 }
-
+function lineLayerAdded(layer)
+{
+    var elm = $('#legend');
+    lineLayerGroupActive = true;
+    if(elm.length > 0)
+        elm.show();
+}
+function polygonLayerAdded(layer)
+{
+    var elm = $('#legend');
+    polygonLayerGroupActive = true;
+    if(elm.length > 0)
+        elm.show();
+}
 function markerLayerRemoved(layer)
 {
     var elm = $('#legend');
     markerLayerGroupActive = false;
+    if(elm.length > 0)
+        elm.hide();
+}
+function lineLayerRemoved(layer)
+{
+    var elm = $('#legend');
+    lineLayerGroupActive = false;
+    if(elm.length > 0)
+        elm.hide();
+}
+function polygonLayerRemoved(layer)
+{
+    var elm = $('#legend');
+    polygonLayerGroupActive = false;
     if(elm.length > 0)
         elm.hide();
 }
@@ -370,6 +451,8 @@ function loadResponseDataCallback()
     var geoJSON = formResponseMngr.getAsGeoJSON();
 
     _buildMarkerLayer(geoJSON);
+    _buildLineLayer(geoJSON);
+    _buildPolygonLayer(geoJSON);
     _updateGeoCodedCount(geoJSON);
 
     // just to make sure the nav container exists
@@ -504,17 +587,53 @@ function _buildMarkerLayer(geoJSON)
           // });
           return marker;
       },
-        onEachFeature: function(feature, layer) {
-          if (geometryBounds !== null){
-              geometryBounds.extend(layer.getBounds());
-          } else {
-              geometryBounds = new L.LatLngBounds(layer.getBounds());
-          }
-          layer.on('click', function(e) {
-              displayDataModal(feature.id);
-          });
-        }
+      filter: function(feature,layer){
+        if (feature.geometry.type=='Point') return true;
+
+      }
   }).addTo(markerLayerGroup);
+
+function _buildLineLayer(geoJSON)
+{
+    var geometryBounds = null;
+
+    L.geoJson(geoJSON, {
+      onEachFeature: function(feature, layer) {
+        if (geometryBounds !== null){
+            geometryBounds.extend(layer.getBounds());
+        } else {
+            geometryBounds = new L.LatLngBounds(layer.getBounds());
+        }
+        layer.on('click', function(e) {
+            displayDataModal(feature.id);
+        });
+      },
+      filter: function(feature,layer){
+         if (feature.geometry.type=='LineString') return true;
+      },
+      style:lineStyle
+}).addTo(lineLayerGroup);
+
+function _buildPolygonLayer(geoJSON)
+{
+    var geometryBounds = null;
+
+    L.geoJson(geoJSON, {
+      onEachFeature: function(feature, layer) {
+        if (geometryBounds !== null){
+            geometryBounds.extend(layer.getBounds());
+        } else {
+            geometryBounds = new L.LatLngBounds(layer.getBounds());
+        }
+        layer.on('click', function(e) {
+            displayDataModal(feature.id);
+        });
+      },
+      filter: function(feature,layer){
+         if (feature.geometry.type=='Polygon') return true;
+      },
+      style:polygonStyle
+}).addTo(polygonLayerGroup);
 
     _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 
@@ -576,12 +695,40 @@ function _recolorMarkerLayer(questionName, responseFilterList)
                 }
             });
         });
+        lineLayerGroup.eachLayer(function(geoJSONLayer) {
+            geoJSONLayer.setStyle(function(feature) {
+                var response = feature.properties[questionName] || notSpecifiedCaption;
+
+                if (responseFilterList.length > 0 && _.indexOf(responseFilterList, response) === -1) {
+                    return _.defaults({fillOpacity: 0, opacity:0}, lineStyle);
+                } else {
+                    return _.defaults({fillColor: questionColorMap[response]}, lineStyle);
+                }
+            });
+        });
+        polygonLayerGroup.eachLayer(function(geoJSONLayer) {
+            geoJSONLayer.setStyle(function(feature) {
+                var response = feature.properties[questionName] || notSpecifiedCaption;
+
+                if (responseFilterList.length > 0 && _.indexOf(responseFilterList, response) === -1) {
+                    return _.defaults({fillOpacity: 0, opacity:0}, polygonStyle);
+                } else {
+                    return _.defaults({fillColor: questionColorMap[response]}, polygonStyle);
+                }
+            });
+        });
 
         // build the legend
         rebuildLegend(questionName, questionColorMap);
     } else {
         markerLayerGroup.eachLayer(function(geoJSONLayer) {
             geoJSONLayer.setStyle(circleStyle);
+        });
+        lineLayerGroup.eachLayer(function(geoJSONLayer) {
+            geoJSONLayer.setStyle(lineStyle);
+        });
+        polygonLayerGroup.eachLayer(function(geoJSONLayer) {
+            geoJSONLayer.setStyle(polygonStyle);
         });
         clearLegend();
     }
