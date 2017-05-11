@@ -575,7 +575,7 @@ function _buildMarkerLayer(geoJSON)
     //var latLngArray = [];
     //var geometryBounds = null;
 
-    L.geoJson(geoJSON, {
+    var markerGeoJson = L.geoJson(geoJSON, {
       pointToLayer: function(feature, latlng) {
           var marker = L.circleMarker(latlng, circleStyle);
           // latLngArray.push(latlng);
@@ -592,9 +592,10 @@ function _buildMarkerLayer(geoJSON)
       filter: function(feature,layer){
         if (feature.geometry.type=='Point') return true;
       }
-  }).addTo(markerLayerGroup);
+  });
+  markerGeoJson.addTo(markerLayerGroup);
 
-  L.geoJson(geoJSON, {
+  var lineGeoJson = L.geoJson(geoJSON, {
     onEachFeature: function(feature, layer) {
       // if (geometryBounds){
       //     geometryBounds.extend(layer.getBounds());
@@ -609,9 +610,10 @@ function _buildMarkerLayer(geoJSON)
       if (feature.geometry.type=='LineString') return true;
     },
     style: lineStyle
-  }).addTo(lineLayerGroup);
+  });
+  lineGeoJson.addTo(lineLayerGroup);
 
-  L.geoJson(geoJSON, {
+  var polygonGeoJson = L.geoJson(geoJSON, {
       onEachFeature: function(feature, layer) {
         layer.on('click', function(e) {
             displayDataModal(feature.id);
@@ -621,16 +623,24 @@ function _buildMarkerLayer(geoJSON)
          if (feature.geometry.type=='Polygon') return true;
       },
       style:polygonStyle
-  }).addTo(polygonLayerGroup);
+  });
+  polygonGeoJson.addTo(polygonLayerGroup);
 
   _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 
   // fitting to bounds with one point will zoom too far
   // don't zoom when we "view by response"
-  if (map && geoJSON){
-      map.fitBounds(geoJSON.getBounds());
+  var mBounds = new L.LatLngBounds();
+  if (markerGeoJson) {
+    mBounds.extend(markerGeoJson.getBounds());
   }
-
+  if (lineGeoJson) {
+    mBounds.extend(lineGeoJson.getBounds());
+  }
+  if (lineGeoJson) {
+    mBounds.extend(polygonGeoJson.getBounds());
+  }
+  if (map) map.fitBounds(mBounds);
 }
 
 
