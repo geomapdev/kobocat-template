@@ -39,6 +39,18 @@ var circleStyle = {
     radius: 8,
     opacity: 0.5
 };
+var lineStyle = {
+    color: '#ff3300',
+    border: 8,
+    opacity: 0.5
+};
+var polygonStyle = {
+    color: '#ff3300',
+    border: 8,
+    fillColor: '#ff3300',
+    fillOpacity: 0.5,
+    opacity: 0.5
+};
 // TODO: can we get the entire URL from mongo API
 var amazonUrlPrefix = "https://formhub.s3.amazonaws.com/";
 var markerLayerGroup = new L.LayerGroup();
@@ -510,13 +522,12 @@ function _buildMarkerLayer(geoJSON)
           } else {
               geometryBounds = new L.LatLngBounds(layer.getBounds());
           }
+          layer
           layer.on('click', function(e) {
               displayDataModal(feature.id);
           });
         },
-        style: function(feature) {
-                return {fill: false};
-        }
+        style:style
   }).addTo(markerLayerGroup);
 
     _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
@@ -529,6 +540,14 @@ function _buildMarkerLayer(geoJSON)
     map.fitBounds(geometryBounds);
 }
 
+function style(feature){
+    if (feature.properties.geometry.type=='Point')
+      return circleStyle;
+    else if (feature.properties.geometry.type=='LineString')
+      return lineStyle;
+    else if (feature.properties.geometry.type=='Polygon')
+        return polygonStyle;
+}
 function _recolorMarkerLayer(questionName, responseFilterList)
 {
     var latLngArray = [];
