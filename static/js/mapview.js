@@ -592,6 +592,15 @@ function _buildMarkerLayer(geoJSON)
 
       }
   }).addTo(markerLayerGroup);
+  _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
+
+  // fitting to bounds with one point will zoom too far
+  // don't zoom when we "view by response"
+  if (geometryBounds==null){
+      map.fitBounds(geometryBounds);
+  }
+
+}
 
 function _buildLineLayer(geoJSON)
 {
@@ -612,8 +621,17 @@ function _buildLineLayer(geoJSON)
          if (feature.geometry.type=='LineString') return true;
       },
       style:lineStyle
-}).addTo(lineLayerGroup);
+  }).addTo(lineLayerGroup);
 
+  _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
+
+  // fitting to bounds with one point will zoom too far
+  // don't zoom when we "view by response"
+  if (geometryBounds==null){
+      map.fitBounds(geometryBounds);
+  }
+
+  }
 function _buildPolygonLayer(geoJSON)
 {
     var geometryBounds = null;
@@ -633,17 +651,18 @@ function _buildPolygonLayer(geoJSON)
          if (feature.geometry.type=='Polygon') return true;
       },
       style:polygonStyle
-}).addTo(polygonLayerGroup);
+  }).addTo(polygonLayerGroup);
 
-    _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
+  _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 
-    // fitting to bounds with one point will zoom too far
-    // don't zoom when we "view by response"
-    if (geometryBounds==null){
-        geometryBounds = new L.LatLngBounds([[85, -180],[-85, 180]]);
-    }
-    map.fitBounds(geometryBounds);
+  // fitting to bounds with one point will zoom too far
+  // don't zoom when we "view by response"
+  if (geometryBounds==null){
+      map.fitBounds(geometryBounds);
+  }
+
 }
+
 
 function _recolorMarkerLayer(questionName, responseFilterList)
 {
