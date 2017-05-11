@@ -32,23 +32,11 @@ var notSpecifiedCaption = gettext("Not Specified");
 var colorPalette = ['#8DD3C7', '#FB8072', '#FFFFB3', '#BEBADA', '#80B1D3', '#FDB462', '#B3DE69', '#FCCDE5', '#D9D9D9',
     '#BC80BD', '#CCEBC5', '#FFED6F'];
 var circleStyle = {
-    color: '#fff',
-    border: 8,
-    fillColor: '#ff3300',
-    fillOpacity: 0.9,
-    radius: 8,
-    opacity: 0.5
-};
-var lineStyle = {
-    color: '#ff3300',
-    border: 8,
-    opacity: 0.5
-};
-var polygonStyle = {
     color: '#ff3300',
     border: 8,
     fillColor: '#ff3300',
     fillOpacity: 0.5,
+    radius: 8,
     opacity: 0.5
 };
 // TODO: can we get the entire URL from mongo API
@@ -522,12 +510,10 @@ function _buildMarkerLayer(geoJSON)
           } else {
               geometryBounds = new L.LatLngBounds(layer.getBounds());
           }
-          layer
           layer.on('click', function(e) {
               displayDataModal(feature.id);
           });
-        },
-        style:style
+        }
   }).addTo(markerLayerGroup);
 
     _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
@@ -540,14 +526,6 @@ function _buildMarkerLayer(geoJSON)
     map.fitBounds(geometryBounds);
 }
 
-function style(feature){
-    if (feature.geometry.type=='Point')
-      return circleStyle;
-    else if (feature.geometry.type=='LineString')
-      return lineStyle;
-    else if (feature.geometry.type=='Polygon')
-        return polygonStyle;
-}
 function _recolorMarkerLayer(questionName, responseFilterList)
 {
     var latLngArray = [];
