@@ -589,14 +589,13 @@ function _buildMarkerLayer(geoJSON)
       },
       filter: function(feature,layer){
         if (feature.geometry.type=='Point') return true;
-
       }
   }).addTo(markerLayerGroup);
   _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 
   // fitting to bounds with one point will zoom too far
   // don't zoom when we "view by response"
-  if (geometryBounds==null){
+  if (map && geometryBounds){
       map.fitBounds(geometryBounds);
   }
 
@@ -625,13 +624,10 @@ function _buildLineLayer(geoJSON)
 
   _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 
-  // fitting to bounds with one point will zoom too far
-  // don't zoom when we "view by response"
-  if (geometryBounds==null){
+  if (map && geometryBounds){
       map.fitBounds(geometryBounds);
   }
-
-  }
+}
 function _buildPolygonLayer(geoJSON)
 {
     var geometryBounds = null;
@@ -653,14 +649,9 @@ function _buildPolygonLayer(geoJSON)
       style:polygonStyle
   }).addTo(polygonLayerGroup);
 
-  _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
-
-  // fitting to bounds with one point will zoom too far
-  // don't zoom when we "view by response"
-  if (geometryBounds==null){
+  if (map && geometryBounds){
       map.fitBounds(geometryBounds);
   }
-
 }
 
 
