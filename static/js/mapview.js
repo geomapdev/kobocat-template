@@ -198,9 +198,9 @@ function initialize() {
     map.addLayer(markerLayerGroup);
     $('div.layer-markerButton').addClass('layer-markerButton-active');
     map.addLayer(lineLayerGroup);
-    $('div.layer-markerButton').addClass('layer-lineButton-active');
+    $('div.layer-lineButton').addClass('layer-lineButton-active');
     map.addLayer(polygonLayerGroup);
-    $('div.layer-markerButton').addClass('layer-polygonButton-active');
+    $('div.layer-polygonButton').addClass('layer-polygonButton-active');
 
     var drawnItems = new L.FeatureGroup();
     map.addLayer(drawnItems);
