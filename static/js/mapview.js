@@ -541,11 +541,11 @@ function _buildMarkerLayer(geoJSON)
 }
 
 function style(feature){
-    if (feature.properties.geometry.type=='Point')
+    if (feature.geometry.type=='Point')
       return circleStyle;
-    else if (feature.properties.geometry.type=='LineString')
+    else if (feature.geometry.type=='LineString')
       return lineStyle;
-    else if (feature.properties.geometry.type=='Polygon')
+    else if (feature.geometry.type=='Polygon')
         return polygonStyle;
 }
 function _recolorMarkerLayer(questionName, responseFilterList)
