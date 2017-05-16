@@ -613,7 +613,7 @@ function _buildLineLayer(geoJSON)
   lineGeoJson.addTo(lineLayerGroup);
 
   if (lineGeoJson && lineGeoJson.getBounds()){
-      map.fitBounds(map.getBounds().extend(lineGeoJson.getBounds());
+      map.fitBounds(map.getBounds().extend(lineGeoJson.getBounds()));
   }
 }
 
@@ -630,7 +630,7 @@ function _buildPolygonLayer(geoJSON)
   polygonGeoJson.addTo(polygonLayerGroup);
 
   if (polygonGeoJson && polygonGeoJson.getBounds()){
-      map.fitBounds(map.getBounds().extend(polygonGeoJson.getBounds());
+      map.fitBounds(map.getBounds().extend(polygonGeoJson.getBounds()));
   }
 }
 
