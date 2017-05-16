@@ -453,9 +453,14 @@ function loadResponseDataCallback()
 
     // get geoJSON data to setup points - relies on questions having been parsed
     var geoJSON = formResponseMngr.getAsGeoJSON();
-
     _buildMarkerLayer(geoJSON);
     _updateGeoCodedCount(geoJSON);
+
+    var geotracesGeoJSON = formResponseMngr.getGeoTracesAsGeoJSON();
+    _buildLineLayer(geotracesGeoJSON);
+
+    var geoshapesGeoJSON = formResponseMngr.getGeoShapesAsGeoJSON();
+    _buildPolygonLayer(geoshapesGeoJSON);
 
     // just to make sure the nav container exists
     var navContainer = $(navContainerSelector);
@@ -573,77 +578,53 @@ function setLanguage(idx)
 function _buildMarkerLayer(geoJSON)
 {
     console.log(geoJSON);
-    //var latLngArray = [];
-    //var geometryBounds = null;
+    var latLngArray = [];
 
     var markerGeoJson = L.geoJson(geoJSON, {
       pointToLayer: function(feature, latlng) {
           var marker = L.circleMarker(latlng, circleStyle);
-          // latLngArray.push(latlng);
-          // if (geometryBounds){
-          //   geometryBounds.extend(latlng);
-          // } else {
-          //   geometryBounds = new L.LatLngBounds(latLngArray);
-          // }
+          latLngArray.push(latlng);
           marker.on('click', function(e) {
               displayDataModal(feature.id);
           });
           return marker;
-      },
-      filter: function(feature,layer){
-        if (feature.geometry.type=='Point') return true;
       }
-  });
+    });
   markerGeoJson.addTo(markerLayerGroup);
-
-  var lineGeoJson = L.geoJson(geoJSON, {
-    onEachFeature: function(feature, layer) {
-      // if (geometryBounds){
-      //     geometryBounds.extend(layer.getBounds());
-      // } else {
-      //     geometryBounds = new L.LatLngBounds(layer.getBounds());
-      // }
-      layer.on('click', function(e) {
-          displayDataModal(feature.id);
-      });
-    },
-    filter: function(feature,layer){
-      if (feature.geometry.type=='LineString') return true;
-    },
-    style: lineStyle
-  });
-  lineGeoJson.addTo(lineLayerGroup);
-
-  var polygonGeoJson = L.geoJson(geoJSON, {
-      onEachFeature: function(feature, layer) {
-        layer.on('click', function(e) {
-            displayDataModal(feature.id);
-        });
-      },
-      filter: function(feature,layer){
-         if (feature.geometry.type=='Polygon') return true;
-      },
-      style:polygonStyle
-  });
-  polygonGeoJson.addTo(polygonLayerGroup);
 
   _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
 
   // fitting to bounds with one point will zoom too far
   // don't zoom when we "view by response"
-  var mBounds = new L.LatLngBounds();
-  if (markerGeoJson) {
-    mBounds.extend(markerGeoJson.getBounds());
-  }
-  if (lineGeoJson) {
-    mBounds.extend(lineGeoJson.getBounds());
-  }
-  if (lineGeoJson) {
-    mBounds.extend(polygonGeoJson.getBounds());
-  }
-  if (map) map.fitBounds(mBounds);
+  var latlngbounds = new L.LatLngBounds(latLngArray);
+  map.fitBounds(latlngbounds);
 }
 
+function _buildLineLayer(geoJSON)
+{
+  var lineGeoJson = L.geoJson(geoJSON, {
+    onEachFeature: function(feature, layer) {
+      layer.on('click', function(e) {
+          displayDataModal(feature.id);
+      });
+    },
+    style: lineStyle
+  });
+  lineGeoJson.addTo(lineLayerGroup);
+}
+
+function _buildPolygonLayer(geoJSON)
+{
+  var polygonGeoJson = L.geoJson(geoJSON, {
+    onEachFeature: function(feature, layer) {
+      layer.on('click', function(e) {
+          displayDataModal(feature.id);
+      });
+    },
+    style: polygonStyle
+  });
+  polygonGeoJson.addTo(polygonLayerGroup);
+}
 
 function _recolorMarkerLayer(questionName, responseFilterList)
 {
