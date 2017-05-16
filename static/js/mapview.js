@@ -611,6 +611,10 @@ function _buildLineLayer(geoJSON)
     style: lineStyle
   });
   lineGeoJson.addTo(lineLayerGroup);
+
+  if (lineGeoJson && lineGeoJson.getBounds()){
+      map.fitBounds(map.getBounds().extend(lineGeoJson.getBounds());
+  }
 }
 
 function _buildPolygonLayer(geoJSON)
@@ -624,6 +628,10 @@ function _buildPolygonLayer(geoJSON)
     style: polygonStyle
   });
   polygonGeoJson.addTo(polygonLayerGroup);
+
+  if (polygonGeoJson && polygonGeoJson.getBounds()){
+      map.fitBounds(map.getBounds().extend(polygonGeoJson.getBounds());
+  }
 }
 
 function _recolorMarkerLayer(questionName, responseFilterList)
