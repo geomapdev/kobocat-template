@@ -603,17 +603,20 @@ function setLanguage(idx)
 function _buildMarkerLayer(geoJSON)
 {
   var markerGeoJson = L.geoJson(geoJSON, {
+    pointToLayer: function(feature, latlng) {
+              var marker = L.circleMarker(latlng, circleStyle);
+              return marker;
+          },
     onEachFeature: function(feature, layer) {
       layer.on('click', function(e) {
           displayDataModal(feature.id);
       });
-    },
-    style: circleStyle
+    }
   });
   markerGeoJson.addTo(markerLayerGroup);
 
   if (markerGeoJson && markerGeoJson.getBounds()){
-      map.fitBounds(map.getBounds().extend(markerGeoJson.getBounds()));
+      map.fitBounds(markerGeoJson.getBounds()));
   }
 }
 
