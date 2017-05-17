@@ -575,29 +575,46 @@ function setLanguage(idx)
     }
 }
 
+// function _buildMarkerLayer(geoJSON)
+// {
+//     var latLngArray = [];
+//
+//     var markerGeoJson = L.geoJson(geoJSON, {
+//       pointToLayer: function(feature, latlng) {
+//           var marker = L.circleMarker(latlng, circleStyle);
+//           latLngArray.push(latlng);
+//           marker.on('click', function(e) {
+//               activeMarker = marker;
+//               displayDataModal(feature.id);
+//           });
+//           return marker;
+//       }
+//     });
+//   markerGeoJson.addTo(markerLayerGroup);
+//
+//   _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
+//
+//   // fitting to bounds with one point will zoom too far
+//   // don't zoom when we "view by response"
+//   var latlngbounds = new L.LatLngBounds(latLngArray);
+//   map.fitBounds(latlngbounds);
+// }
+
 function _buildMarkerLayer(geoJSON)
 {
-    var latLngArray = [];
-
-    var markerGeoJson = L.geoJson(geoJSON, {
-      pointToLayer: function(feature, latlng) {
-          var marker = L.circleMarker(latlng, circleStyle);
-          latLngArray.push(latlng);
-          marker.on('click', function(e) {
-              activeMarker = marker;
-              displayDataModal(feature.id);
-          });
-          return marker;
-      }
-    });
+  var markerGeoJson = L.geoJson(geoJSON, {
+    onEachFeature: function(feature, layer) {
+      layer.on('click', function(e) {
+          displayDataModal(feature.id);
+      });
+    },
+    style: circleStyle
+  });
   markerGeoJson.addTo(markerLayerGroup);
 
-  _.defer(refreshHexOverLay); // TODO: add a toggle to do this only if hexOn = true;
-
-  // fitting to bounds with one point will zoom too far
-  // don't zoom when we "view by response"
-  var latlngbounds = new L.LatLngBounds(latLngArray);
-  map.fitBounds(latlngbounds);
+  if (markerGeoJson && markerGeoJson.getBounds()){
+      map.fitBounds(map.getBounds().extend(markerGeoJson.getBounds()));
+  }
 }
 
 function _buildLineLayer(geoJSON)
