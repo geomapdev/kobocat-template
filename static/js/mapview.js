@@ -577,7 +577,6 @@ function setLanguage(idx)
 
 function _buildMarkerLayer(geoJSON)
 {
-    console.log(geoJSON);
     var latLngArray = [];
 
     var markerGeoJson = L.geoJson(geoJSON, {
@@ -585,6 +584,7 @@ function _buildMarkerLayer(geoJSON)
           var marker = L.circleMarker(latlng, circleStyle);
           latLngArray.push(latlng);
           marker.on('click', function(e) {
+              activeMarker = marker;
               displayDataModal(feature.id);
           });
           return marker;
@@ -1062,7 +1062,7 @@ function rebuildLegend(questionName, questionColorMap)
 function getBootstrapFields()
 {
     // we only want to load gps and select one data to begin with
-    var fields = ['_id', constants.GEOLOCATION, constants.GEOMETRY];
+    var fields = ['_id', constants.GEOLOCATION, constants.GEOPOINTS, constants.GEOTRACES, constants.GEOSHAPES];
     var idx, question;
     if(!constants) throw getBootstrapFields__str;
     for(idx in formJSONMngr.selectOneQuestions)
