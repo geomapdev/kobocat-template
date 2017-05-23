@@ -615,9 +615,9 @@ function _buildMarkerLayer(geoJSON)
   });
   markerGeoJson.addTo(markerLayerGroup);
 
-  if (markerGeoJson && markerGeoJson.getBounds()){
-      map.fitBounds(markerGeoJson.getBounds());
-  }
+  //if (markerGeoJson && markerGeoJson.getBounds()){
+  //    map.fitBounds(markerGeoJson.getBounds());
+  //}
 }
 
 function _buildLineLayer(geoJSON)
