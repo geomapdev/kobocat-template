@@ -462,6 +462,12 @@ function loadResponseDataCallback()
     var geoshapesGeoJSON = formResponseMngr.getGeoShapesAsGeoJSON();
     _buildPolygonLayer(geoshapesGeoJSON);
 
+    var allgeoJSON = {type:"FeatureCollection",features:geoJSON.features.concat(geotracesGeoJSON.features.concat(geoshapesGeoJSON))};
+    if (allgeoJSON.features.length>0){
+        var geoj = L.geoJson(allgeoJSON);
+        map.fitBounds(geoj.getBounds());
+    }
+
     // just to make sure the nav container exists
     var navContainer = $(navContainerSelector);
     if(navContainer.length == 1)
@@ -614,10 +620,6 @@ function _buildMarkerLayer(geoJSON)
     }
   });
   markerGeoJson.addTo(markerLayerGroup);
-
-  //if (markerGeoJson && markerGeoJson.getBounds()){
-  //    map.fitBounds(markerGeoJson.getBounds());
-  //}
 }
 
 function _buildLineLayer(geoJSON)
@@ -631,10 +633,6 @@ function _buildLineLayer(geoJSON)
     style: lineStyle
   });
   lineGeoJson.addTo(lineLayerGroup);
-
-  if (lineGeoJson && lineGeoJson.getBounds()){
-      map.fitBounds(map.getBounds().extend(lineGeoJson.getBounds()));
-  }
 }
 
 function _buildPolygonLayer(geoJSON)
@@ -648,10 +646,6 @@ function _buildPolygonLayer(geoJSON)
     style: polygonStyle
   });
   polygonGeoJson.addTo(polygonLayerGroup);
-
-  if (polygonGeoJson && polygonGeoJson.getBounds()){
-      map.fitBounds(map.getBounds().extend(polygonGeoJson.getBounds()));
-  }
 }
 
 function _recolorMarkerLayer(questionName, responseFilterList)
